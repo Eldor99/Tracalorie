@@ -1,4 +1,38 @@
 // Storage Controller
+const StorageCtrl = (function(){
+  // Public methods
+  return {
+    storeItem: function(item){
+      let items;
+      // Check if any items in ls
+      if(localStorage.getItem('items') === null){
+        items = [];
+        // push new item
+        items.push(item);
+        // Set ls
+        localStorage.setItem('items', JSON.stringify(items));
+      }else{
+        // Get what is already in ls
+        items = JSON.parse(localStorage.getItem('items'));
+
+        // Push to new item
+        items.push(item);
+
+        // Re set ls
+        localStorage.setItem('items', JSON.stringify(items));
+      }
+    },
+    getItemsFromStorage: function(){
+      let items = [];
+      if(localStorage.getItem('items') === null){
+        items = [];
+      }else{
+        items = JSON.parse(localStorage.getItem('items'));
+      }
+      return items;
+    }
+  }
+})();
 
 // Item Controller
 const ItemCtrl = (function(){
@@ -11,11 +45,12 @@ const ItemCtrl = (function(){
 
   // Data Structure / State
   const data = {
-    items: [
-      // {id: 0, name: 'Steak', calories: 400},
-      // {id: 1, name: 'Burger', calories: 600},
-      // {id: 2, name: 'Ice Cream', calories: 100},
-    ],
+    // items: [
+    //   // {id: 0, name: 'Steak', calories: 400},
+    //   // {id: 1, name: 'Burger', calories: 600},
+    //   // {id: 2, name: 'Ice Cream', calories: 100},
+    // ],
+    items: StorageCtrl.getItemsFromStorage(),
     currentItem: null,
     totalCalories: 0
   }
@@ -227,7 +262,7 @@ const UICtrl = (function(){
   }
 })();
 // App Controller
-const App = (function(ItemCtrl, UICtrl){
+const App = (function(ItemCtrl, StorageCtrl, UICtrl){
   // Load event listeners
   const loadEventListeners = function(){
     // Get UI Selectors
@@ -278,6 +313,9 @@ const App = (function(ItemCtrl, UICtrl){
 
       // Add total calories to UI
       UICtrl.showTotalCalories(totalCalories);
+
+      // Store in localStorage
+      StorageCtrl.storeItem(newItem);
 
       // Clear fields
       UICtrl.clearInput();
@@ -399,7 +437,7 @@ const App = (function(ItemCtrl, UICtrl){
     }
   }
 
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, StorageCtrl,  UICtrl);
 
 // INitialize App
 App.init();
